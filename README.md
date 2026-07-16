@@ -4,9 +4,8 @@
 常见git提交指令如下：
 
   git clone <仓库地址> 
-  //
+  #
   cd <仓库目录>
-
   # 将文件复制到这里或直接修改
   git status
   git add .
