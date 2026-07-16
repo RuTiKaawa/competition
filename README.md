@@ -7,11 +7,14 @@
   
   cd <仓库目录>
 
-  
   将文件复制到这里或直接修改
+  
   git status
+  
   git add .
+  
   git commit -m "提交说明"
+  
   git push origin main
 
   如果默认分支不是 main，先查看：
