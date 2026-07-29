@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#071310">
+  <title>Vanna AI · Chinook 数据助手</title>
+  <style>
+    :root {
+      --ink: #f1f7f5;
+      --muted: #9fb4ae;
+      --dim: #6f8580;
+      --canvas: #06110e;
+      --panel: rgba(13, 31, 26, .82);
+      --panel-strong: #102a23;
+      --line: rgba(152, 191, 179, .18);
+      --teal: #45e0bc;
+      --teal-deep: #12a987;
+      --amber: #f5c66d;
+      --shadow: 0 28px 80px rgba(0, 0, 0, .34);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-width: 0;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 4%, rgba(37, 178, 143, .16), transparent 28rem),
+        radial-gradient(circle at 92% 24%, rgba(56, 117, 101, .12), transparent 30rem),
+        var(--canvas);
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      content: "";
+      opacity: .2;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, black, transparent 78%);
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-width: 0;
+      padding: 24px 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      gap: 11px;
+      align-items: center;
+      min-width: 0;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 750;
+      letter-spacing: .08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      display: grid;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid rgba(69, 224, 188, .45);
+      border-radius: 11px;
+      color: var(--teal);
+      background: rgba(69, 224, 188, .08);
+      box-shadow: inset 0 0 20px rgba(69, 224, 188, .06);
+    }
+
+    .nav-link {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 650;
+      text-decoration: none;
+      transition: color .2s ease;
+    }
+
+    .nav-link:hover { color: var(--teal); }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, .7fr);
+      gap: 72px;
+      align-items: end;
+      min-width: 0;
+      padding: 94px 0 96px;
+    }
+
+    .hero-copy,
+    .hero-aside { min-width: 0; }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 9px;
+      align-items: center;
+      margin-bottom: 24px;
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 7px;
+      height: 7px;
+      content: "";
+      border-radius: 999px;
+      background: var(--teal);
+      box-shadow: 0 0 18px var(--teal);
+    }
+
+    h1 {
+      max-width: 780px;
+      margin: 0;
+      font-size: clamp(48px, 7vw, 88px);
+      font-weight: 720;
+      line-height: .98;
+      letter-spacing: -.055em;
+      text-wrap: balance;
+    }
+
+    .accent {
+      color: transparent;
+      background: linear-gradient(110deg, #ecfff9 0%, var(--teal) 72%);
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    .lede {
+      max-width: 720px;
+      margin: 30px 0 0;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 20px);
+      line-height: 1.72;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 38px;
+    }
+
+    .button {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 20px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      font-size: 14px;
+      font-weight: 750;
+      text-decoration: none;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .button:hover { transform: translateY(-2px); }
+
+    .button-primary {
+      border-color: var(--teal);
+      color: #03251d;
+      background: var(--teal);
+      box-shadow: 0 14px 40px rgba(69, 224, 188, .18);
+    }
+
+    .button-secondary {
+      color: var(--muted);
+      background: rgba(255, 255, 255, .025);
+    }
+
+    .hero-aside {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: linear-gradient(155deg, rgba(25, 59, 49, .75), rgba(9, 25, 20, .75));
+      box-shadow: var(--shadow);
+    }
+
+    .aside-label {
+      color: var(--dim);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .prompt {
+      margin: 14px 0 24px;
+      font-size: 19px;
+      font-weight: 620;
+      line-height: 1.55;
+    }
+
+    .flow-mini {
+      display: grid;
+      gap: 9px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .flow-mini li {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .flow-mini span {
+      display: grid;
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--teal);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .section {
+      min-width: 0;
+      padding: 36px 0 104px;
+    }
+
+    .section-heading {
+      display: flex;
+      gap: 30px;
+      align-items: end;
+      justify-content: space-between;
+      min-width: 0;
+      margin-bottom: 32px;
+    }
+
+    .kicker {
+      margin: 0 0 9px;
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(30px, 4.5vw, 48px);
+      font-weight: 680;
+      letter-spacing: -.035em;
+    }
+
+    .section-note {
+      max-width: 410px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .card {
+      position: relative;
+      min-width: 0;
+      min-height: 292px;
+      padding: 22px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .16);
+    }
+
+    .card:not(:last-child)::after {
+      position: absolute;
+      top: 50%;
+      right: -15px;
+      z-index: 2;
+      width: 15px;
+      height: 1px;
+      content: "";
+      background: rgba(69, 224, 188, .65);
+    }
+
+    .card-index {
+      color: var(--dim);
+      font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: .1em;
+    }
+
+    .card h3 {
+      margin: 32px 0 10px;
+      font-size: 20px;
+      font-weight: 680;
+      letter-spacing: -.02em;
+    }
+
+    .card p {
+      min-height: 62px;
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.58;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .tag,
+    .status {
+      max-width: 100%;
+      padding: 7px 9px;
+      overflow-wrap: anywhere;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      color: #bdd0cb;
+      background: rgba(255, 255, 255, .025);
+      font-size: 11px;
+      line-height: 1.2;
+    }
+
+    .status {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      border-color: rgba(69, 224, 188, .25);
+      color: var(--teal);
+      background: rgba(69, 224, 188, .07);
+    }
+
+    .optional-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      min-width: 0;
+      margin-top: 14px;
+    }
+
+    .optional {
+      min-width: 0;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(10, 26, 21, .62);
+    }
+
+    .optional-top {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .optional h3 {
+      min-width: 0;
+      margin: 0;
+      font-size: 15px;
+      font-weight: 670;
+    }
+
+    .optional p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .pill {
+      flex: 0 0 auto;
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+
+    .pill-live {
+      color: var(--teal);
+      background: rgba(69, 224, 188, .1);
+    }
+
+    .pill-next {
+      color: var(--amber);
+      background: rgba(245, 198, 109, .09);
+    }
+
+    .cta {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 30px;
+      align-items: center;
+      min-width: 0;
+      margin-bottom: 48px;
+      padding: clamp(26px, 5vw, 48px);
+      border: 1px solid rgba(69, 224, 188, .24);
+      border-radius: 24px;
+      background:
+        linear-gradient(120deg, rgba(69, 224, 188, .12), rgba(69, 224, 188, .025)),
+        var(--panel-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .cta-copy { min-width: 0; }
+
+    .cta h2 { font-size: clamp(28px, 4vw, 42px); }
+
+    .cta p {
+      margin: 13px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    footer {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 0 36px;
+      color: var(--dim);
+      font-size: 12px;
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    @media (max-width: 1040px) {
+      .architecture { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .card { min-height: 250px; }
+      .card:not(:last-child)::after { display: none; }
+      .architecture .card:last-child { grid-column: 1 / -1; min-height: 220px; }
+      .optional-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 28px, 1180px); }
+      .nav { padding-top: 18px; }
+      .nav-link { font-size: 12px; }
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 42px;
+        padding: 68px 0 76px;
+      }
+      .section { padding-bottom: 76px; }
+      .section-heading {
+        display: grid;
+        gap: 16px;
+      }
+      .architecture,
+      .optional-grid,
+      .cta { grid-template-columns: minmax(0, 1fr); }
+      .architecture .card:last-child { grid-column: auto; }
+      .card { min-height: 0; }
+      .card p { min-height: 0; }
+      .cta .button { width: 100%; }
+      footer { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media (max-width: 380px) {
+      .shell { width: calc(100% - 24px); }
+      .brand { font-size: 13px; }
+      h1 { font-size: 44px; }
+      .hero-aside,
+      .card,
+      .optional { padding: 18px; }
+      .actions .button { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell nav">
+    <a class="brand" href="/" aria-label="Vanna AI 首页">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="19" height="19" viewBox="0 0 20 20" fill="none">
+          <path d="M3 4.5 9.9 16 17 4.5h-3.4L9.9 11 6.2 4.5H3Z" fill="currentColor"/>
+        </svg>
+      </span>
+      Vanna AI
+    </a>
+    <a class="nav-link" href="/chat/">打开数据助手&nbsp; ↗</a>
+  </header>
+
+  <main>
+    <section class="shell hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Vanna 2.0 · Live capability map</div>
+        <h1>把自然语言变成<br><span class="accent">可验证的数据答案</span></h1>
+        <p class="lede">
+          面向 Chinook 音乐商店数据的本地分析入口。DeepSeek 负责理解问题，
+          Vanna 负责调用只读 SQL、返回交互式表格，并在需要时生成 Plotly 图表。
+        </p>
+        <div class="actions">
+          <a class="button button-primary" href="/chat/">进入数据助手 <span aria-hidden="true">→</span></a>
+          <a class="button button-secondary" href="#architecture">查看能力架构</a>
+        </div>
+      </div>
+
+      <aside class="hero-aside" aria-label="示例分析流程">
+        <div class="aside-label">Try this prompt</div>
+        <p class="prompt">“按国家统计销售额，并绘制柱状图。”</p>
+        <ol class="flow-mini">
+          <li><span>01</span> DeepSeek 规划查询</li>
+          <li><span>02</span> Chinook 执行只读 SQL</li>
+          <li><span>03</span> 返回数据表与隔离 CSV</li>
+          <li><span>04</span> Plotly 渲染交互图表</li>
+        </ol>
+      </aside>
+    </section>
+
+    <section class="shell section" id="architecture">
+      <div class="section-heading">
+        <div>
+          <p class="kicker">Request path</p>
+          <h2>当前已打通的五层能力</h2>
+        </div>
+        <p class="section-note">
+          下列卡片描述的是本机实际接入能力；演示环境没有启用的企业功能，会明确标为“可扩展”。
+        </p>
+      </div>
+
+      <div class="architecture">
+        <article class="card">
+          <span class="card-index">01 / FRONTEND</span>
+          <span class="status">已启用</span>
+          <h3>Vanna Web Component</h3>
+          <p>官方 <code>&lt;vanna-chat&gt;</code> 组件，按结构化事件渐进展示状态、表格和图表。</p>
+          <ul class="tags">
+            <li class="tag">响应式界面</li>
+            <li class="tag">流式响应</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <span class="card-index">02 / SERVER</span>
+          <span class="status">已启用</span>
+          <h3>Python Server</h3>
+          <p>外层 FastAPI 承载首页，官方 Vanna 子应用稳定挂载在 <code>/chat</code>。</p>
+          <ul class="tags">
+            <li class="tag">SSE</li>
+            <li class="tag">WebSocket</li>
+            <li class="tag">Poll fallback</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <span class="card-index">03 / AGENT</span>
+          <span class="status">演示模式</span>
+          <h3>User-Aware Agent</h3>
+          <p>本地示例身份 <code>local-demo</code>，工具注册时显式绑定 user / admin 权限组。</p>
+          <ul class="tags">
+            <li class="tag">用户隔离</li>
+            <li class="tag">工具权限</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <span class="card-index">04 / TOOLS</span>
+          <span class="status">已启用</span>
+          <h3>Data Tools</h3>
+          <p>官方 Chinook SQLite 只读查询；结果同时生成交互表格和供图表工具读取的 CSV。</p>
+          <ul class="tags">
+            <li class="tag">Read-only SQL</li>
+            <li class="tag">Data table</li>
+            <li class="tag">Plotly</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <span class="card-index">05 / LLM</span>
+          <span class="status">已接入</span>
+          <h3>DeepSeek V4 Flash</h3>
+          <p>通过 OpenAI 兼容接口调用；使用非思考模式保证多轮 SQL → 可视化工具调用完整衔接。</p>
+          <ul class="tags">
+            <li class="tag">Tool calling</li>
+            <li class="tag">API key 仅服务端</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="optional-grid" aria-label="可选能力状态">
+        <article class="optional">
+          <div class="optional-top">
+            <h3>会话上下文</h3>
+            <span class="pill pill-live">已启用</span>
+          </div>
+          <p>当前进程内保存对话上下文，适合本地演示与连续追问。</p>
+        </article>
+        <article class="optional">
+          <div class="optional-top">
+            <h3>持久化记忆</h3>
+            <span class="pill pill-next">可扩展</span>
+          </div>
+          <p>尚未接入向量库或持久化 Tool Memory，不宣称跨进程学习。</p>
+        </article>
+        <article class="optional">
+          <div class="optional-top">
+            <h3>审计与观测</h3>
+            <span class="pill pill-next">可扩展</span>
+          </div>
+          <p>当前未配置 AuditLogger、链路追踪和生产指标后端。</p>
+        </article>
+        <article class="optional">
+          <div class="optional-top">
+            <h3>业务扩展工具</h3>
+            <span class="pill pill-next">可扩展</span>
+          </div>
+          <p>可继续注册导出、业务指标、审批或外部服务工具。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="shell cta">
+      <div class="cta-copy">
+        <p class="kicker">Ready to query</p>
+        <h2>从一个真实问题开始</h2>
+        <p>试试“列出数据库所有表”，或让助手按国家统计销售额并绘制柱状图。</p>
+      </div>
+      <a class="button button-primary" href="/chat/">进入数据助手 <span aria-hidden="true">→</span></a>
+    </section>
+  </main>
+
+  <footer class="shell">
+    <span>Vanna 2.0 · Chinook · DeepSeek</span>
+    <a href="/chat/">打开富聊天界面</a>
+  </footer>
+</body>
+</html>
