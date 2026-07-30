@@ -7,6 +7,15 @@
 - `/health` 与 `/chat/health`：外层和 Vanna 子应用健康检查。
 - Chinook 只读 SQL、交互数据表、共享隔离 CSV 与 Plotly 图表。
 
+## 前置准备
+
+### 1. 下载示例数据库
+本项目依赖 Chinook 示例数据库。请下载 `Chinook.sqlite` 并将其放置在仓库根目录下：
+
+```bash
+# 示例：使用 wget/curl 下载 Chinook 数据库
+curl -L -o Chinook.sqlite [https://raw.githubusercontent.com/jeroen/all-my-blog-post-files/master/Chinook.sqlite](https://raw.githubusercontent.com/jeroen/all-my-blog-post-files/master/Chinook.sqlite)
+
 ## 启动
 
 确认仓库根目录存在非空的 `Chinook.sqlite`，并在 `.env` 中配置：
