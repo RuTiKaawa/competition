@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#071310">
+  <title>Vanna AI · 个人设置</title>
+  <style>
+    :root {
+      --ink: #f1f7f5;
+      --muted: #9fb4ae;
+      --dim: #6f8580;
+      --canvas: #06110e;
+      --panel: rgba(13, 31, 26, .86);
+      --panel-soft: rgba(16, 42, 35, .62);
+      --line: rgba(152, 191, 179, .18);
+      --teal: #45e0bc;
+      --amber: #f5c66d;
+      --danger: #ff8e9f;
+      --shadow: 0 28px 80px rgba(0, 0, 0, .32);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-width: 0;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 4%, rgba(37, 178, 143, .16), transparent 28rem),
+        radial-gradient(circle at 92% 24%, rgba(56, 117, 101, .12), transparent 30rem),
+        var(--canvas);
+    }
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      content: "";
+      opacity: .2;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, black, transparent 78%);
+    }
+    a { color: inherit; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: wait; opacity: .55; }
+    .shell { width: min(1100px, calc(100% - 40px)); margin: 0 auto; }
+    .nav {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 0;
+    }
+    .brand {
+      display: inline-flex;
+      gap: 11px;
+      align-items: center;
+      font-size: 15px;
+      font-weight: 750;
+      letter-spacing: .08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid rgba(69, 224, 188, .45);
+      border-radius: 11px;
+      color: var(--teal);
+      background: rgba(69, 224, 188, .08);
+    }
+    .nav-links { display: flex; gap: 18px; align-items: center; }
+    .nav-link { color: var(--muted); font-size: 13px; font-weight: 650; text-decoration: none; }
+    .nav-link:hover { color: var(--teal); }
+    .page-head { padding: 54px 0 34px; }
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    h1 { margin: 0; font-size: clamp(38px, 6vw, 64px); letter-spacing: -.045em; }
+    .lede { max-width: 720px; margin: 17px 0 0; color: var(--muted); line-height: 1.7; }
+    .readiness {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .readiness-item {
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .025);
+    }
+    .readiness-item span { display: block; color: var(--dim); font-size: 11px; }
+    .readiness-item strong { display: block; margin-top: 5px; font-size: 14px; }
+    .settings-section {
+      scroll-margin-top: 24px;
+      margin: 0 0 28px;
+      padding: clamp(22px, 4vw, 34px);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .section-head {
+      display: flex;
+      gap: 24px;
+      align-items: start;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .section-head h2 { margin: 0; font-size: clamp(25px, 4vw, 34px); letter-spacing: -.025em; }
+    .section-head p { max-width: 620px; margin: 8px 0 0; color: var(--muted); line-height: 1.65; }
+    .pill {
+      flex: 0 0 auto;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: var(--amber);
+      background: rgba(245, 198, 109, .09);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .pill.ready { color: var(--teal); background: rgba(69, 224, 188, .1); }
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .config-item {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel-soft);
+    }
+    .config-item span { display: block; color: var(--dim); font-size: 11px; }
+    .config-item strong {
+      display: block;
+      margin-top: 6px;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+    }
+    .key-form, .upload-form {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) auto auto;
+      gap: 10px;
+      align-items: end;
+    }
+    .upload-form { grid-template-columns: minmax(150px, .5fr) minmax(220px, 1fr) auto; }
+    label { display: grid; gap: 8px; min-width: 0; color: var(--muted); font-size: 12px; }
+    input {
+      min-width: 0;
+      min-height: 44px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      outline: none;
+      color: var(--ink);
+      background: rgba(3, 15, 12, .7);
+    }
+    input:focus { border-color: rgba(69, 224, 188, .7); }
+    input[type="file"] { padding: 8px 10px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, .035);
+      font-weight: 720;
+    }
+    .button:hover { border-color: rgba(69, 224, 188, .55); }
+    .button.primary { border-color: var(--teal); color: #03251d; background: var(--teal); }
+    .button.danger { color: var(--danger); }
+    .button[hidden] { display: none; }
+    .fine-print { margin: 13px 0 0; color: var(--dim); font-size: 12px; line-height: 1.55; }
+    .notice { min-height: 22px; margin-top: 12px; color: var(--teal); font-size: 13px; }
+    .notice.error { color: var(--danger); }
+    .sample-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: center;
+      margin: 0 0 22px;
+      padding: 20px;
+      border: 1px solid rgba(69, 224, 188, .25);
+      border-radius: 17px;
+      background: linear-gradient(120deg, rgba(69, 224, 188, .09), rgba(255, 255, 255, .015));
+    }
+    .sample-card h3 { margin: 0; font-size: 17px; }
+    .sample-card p { margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .subheading { margin: 28px 0 14px; font-size: 16px; }
+    .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .card {
+      min-width: 0;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .025);
+    }
+    .card-top { display: flex; gap: 14px; align-items: start; justify-content: space-between; }
+    .card h3 { margin: 0; overflow-wrap: anywhere; font-size: 16px; }
+    .card p { margin: 10px 0 15px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .card-actions .button { min-height: 36px; padding: 0 11px; font-size: 12px; }
+    pre {
+      max-height: 280px;
+      margin: 14px 0 0;
+      padding: 12px;
+      overflow: auto;
+      border-radius: 10px;
+      color: #c9ddd7;
+      background: rgba(0, 0, 0, .28);
+      font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .empty {
+      grid-column: 1 / -1;
+      padding: 24px;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .unfinished { opacity: .68; }
+    .unfinished .pill { color: var(--amber); background: rgba(245, 198, 109, .09); }
+    footer { padding: 12px 0 44px; color: var(--dim); font-size: 12px; text-align: center; }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 28px, 1100px); }
+      .nav { padding-top: 18px; }
+      .readiness, .config-grid, .cards { grid-template-columns: minmax(0, 1fr); }
+      .key-form, .upload-form { grid-template-columns: minmax(0, 1fr); }
+      .sample-card { grid-template-columns: minmax(0, 1fr); }
+      .sample-card .button { width: 100%; }
+      .section-head { display: grid; gap: 12px; }
+      .section-head .pill { justify-self: start; }
+    }
+    @media (max-width: 420px) {
+      .shell { width: calc(100% - 22px); }
+      .nav-links { gap: 10px; }
+      .nav-link { font-size: 11px; }
+      .brand { font-size: 13px; }
+      .settings-section { border-radius: 19px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <header class="shell nav">
+    <a class="brand" href="/" aria-label="Vanna AI 首页">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="19" height="19" viewBox="0 0 20 20" fill="none">
+          <path d="M3 4.5 9.9 16 17 4.5h-3.4L9.9 11 6.2 4.5H3Z" fill="currentColor"/>
+        </svg>
+      </span>
+      Vanna AI
+    </a>
+    <nav class="nav-links">
+      <a class="nav-link" href="/">能力首页</a>
+      <a class="nav-link" href="/chat/">数据助手 ↗</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <section class="page-head">
+      <p class="eyebrow">Personal settings</p>
+      <h1>个人设置</h1>
+      <p class="lede">先配置模型凭据和数据源，再进入聊天分析。缺少任意一项都不会阻止应用启动，页面会明确提示下一步。</p>
+      <div class="readiness" aria-label="当前就绪状态">
+        <div class="readiness-item"><span>模型 API</span><strong id="summary-llm">检查中…</strong></div>
+        <div class="readiness-item"><span>可用数据源</span><strong id="summary-sources">检查中…</strong></div>
+        <div class="readiness-item"><span>聊天分析</span><strong id="summary-chat">检查中…</strong></div>
+      </div>
+    </section>
+
+    <section class="settings-section" id="model-api" aria-labelledby="model-title">
+      <div class="section-head">
+        <div>
+          <h2 id="model-title">模型 API</h2>
+          <p>当前接入 DeepSeek。个人 Key 会先请求 DeepSeek 验证，成功后才加密保存；个人配置优先于服务器的 <code>.env</code>。</p>
+        </div>
+        <span class="pill" id="llm-status">检查中</span>
+      </div>
+      <div class="config-grid">
+        <div class="config-item"><span>服务商</span><strong id="llm-provider">DeepSeek</strong></div>
+        <div class="config-item"><span>模型</span><strong id="llm-model">—</strong></div>
+        <div class="config-item"><span>API 地址</span><strong id="llm-base-url">—</strong></div>
+      </div>
+      <form class="key-form" id="key-form">
+        <label>个人 DeepSeek API Key
+          <input id="api-key" name="api_key" type="password" autocomplete="off" placeholder="输入后验证并加密保存" required>
+        </label>
+        <button class="button primary" id="save-key" type="submit">验证并保存</button>
+        <button class="button danger" id="delete-key" type="button" hidden>删除个人 Key</button>
+      </form>
+      <p class="fine-print">页面永远不会回显已保存的 Key。生产部署请使用 HTTPS，并通过 <code>VANNA_CREDENTIAL_ENCRYPTION_KEY</code> 固定主加密密钥。</p>
+      <div class="notice" id="llm-notice" role="status"></div>
+    </section>
+
+    <section class="settings-section" id="data-sources" aria-labelledby="sources-title">
+      <div class="section-head">
+        <div>
+          <h2 id="sources-title">数据源管理</h2>
+          <p>可以下载官方示例，也可以手动上传 CSV / ZIP。导入后生成只读 DuckDB；删除会同时清理数据库文件、原始文件和对话绑定。</p>
+        </div>
+        <span class="pill" id="source-status">检查中</span>
+      </div>
+
+      <article class="sample-card">
+        <div>
+          <h3>体验 Chinook 官方示例</h3>
+          <p>可选项。点击后从 <code>vanna.ai/Chinook.sqlite</code> 下载、校验 SQLite 完整性与 11 张表，再原子写入本地；重复点击不会重复安装。</p>
+        </div>
+        <button class="button primary" id="install-chinook" type="button">下载并体验</button>
+      </article>
+
+      <h3 class="subheading">导入本地数据</h3>
+      <form class="upload-form" id="upload-form">
+        <label>数据源名称
+          <input name="source_name" type="text" placeholder="例如：制造业分析库" required>
+        </label>
+        <label>CSV 或 ZIP 文件
+          <input id="source-files" name="files" type="file" accept=".csv,.zip" multiple required>
+        </label>
+        <button class="button primary" type="submit">开始导入</button>
+      </form>
+      <div class="notice" id="source-notice" role="status"></div>
+
+      <h3 class="subheading">已添加数据源</h3>
+      <div class="cards" id="sources"></div>
+
+      <h3 class="subheading">后续接入（未完成）</h3>
+      <div class="cards">
+        <article class="card unfinished">
+          <div class="card-top"><h3>MySQL</h3><span class="pill">未完成</span></div>
+          <p>公网数据库授权、连通性测试与只读账户校验入口预留。</p>
+          <button class="button" type="button" data-unfinished>授权连接</button>
+        </article>
+        <article class="card unfinished">
+          <div class="card-top"><h3>PostgreSQL</h3><span class="pill">未完成</span></div>
+          <p>公网数据库授权、SSL 配置与 Schema 选择入口预留。</p>
+          <button class="button" type="button" data-unfinished>授权连接</button>
+        </article>
+        <article class="card unfinished">
+          <div class="card-top"><h3>AnalyticDB PostgreSQL</h3><span class="pill">未完成</span></div>
+          <p>VPC / OpenAPI 代理访问、权限同步和网络诊断入口预留。</p>
+          <button class="button" type="button" data-unfinished>配置连接</button>
+        </article>
+        <article class="card unfinished">
+          <div class="card-top"><h3>RAG 向量库</h3><span class="pill">未完成</span></div>
+          <p>Embedding 模型、文档切分、索引构建与检索配置将在下一阶段接入。</p>
+          <button class="button" type="button" data-unfinished>查看占位入口</button>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell">运行数据、数据库与凭据均保存在被 Git 忽略的 <code>.vanna_data/</code> 中。</footer>
+
+  <script>
+    const llmNotice = document.querySelector('#llm-notice');
+    const sourceNotice = document.querySelector('#source-notice');
+    const sources = document.querySelector('#sources');
+    const installButton = document.querySelector('#install-chinook');
+    const deleteKeyButton = document.querySelector('#delete-key');
+    const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[char]));
+
+    function showNotice(target, message, error = false) {
+      target.textContent = message;
+      target.classList.toggle('error', error);
+    }
+
+    async function jsonRequest(url, options = {}) {
+      const response = await fetch(url, options);
+      let body = {};
+      try { body = await response.json(); } catch (_) { body = {}; }
+      if (!response.ok) throw new Error(body.detail || `请求失败（HTTP ${response.status}）`);
+      return body;
+    }
+
+    async function loadReadiness() {
+      const state = await jsonRequest('/api/readiness');
+      document.querySelector('#summary-llm').textContent = state.llm.configured ? '已配置' : '待配置';
+      document.querySelector('#summary-sources').textContent = `${state.data_sources.ready_count} 个可用`;
+      document.querySelector('#summary-chat').textContent = state.chat_ready ? '可以开始' : '等待配置';
+      document.querySelector('#source-status').textContent = state.data_sources.configured ? `${state.data_sources.ready_count} 个已就绪` : '暂无数据源';
+      document.querySelector('#source-status').classList.toggle('ready', state.data_sources.configured);
+    }
+
+    async function loadLlm() {
+      const status = await jsonRequest('/api/settings/llm');
+      document.querySelector('#llm-provider').textContent = status.provider;
+      document.querySelector('#llm-model').textContent = status.model;
+      document.querySelector('#llm-base-url').textContent = status.base_url;
+      const badge = document.querySelector('#llm-status');
+      const labels = {
+        personal: '个人 Key 已生效',
+        environment: '服务器 Key 已生效',
+        none: '未配置'
+      };
+      badge.textContent = labels[status.source] || '未配置';
+      badge.classList.toggle('ready', status.configured);
+      deleteKeyButton.hidden = status.source !== 'personal';
+      if (status.error) showNotice(llmNotice, status.error, true);
+      return status;
+    }
+
+    async function loadSources() {
+      const items = await jsonRequest('/api/data-sources');
+      const hasChinook = items.some(source => source.id === 'chinook');
+      installButton.disabled = hasChinook;
+      installButton.textContent = hasChinook ? 'Chinook 已就绪' : '下载并体验';
+      if (!items.length) {
+        sources.innerHTML = '<div class="empty">暂无数据源。请下载 Chinook 示例，或在上方手动导入 CSV / ZIP。</div>';
+        return items;
+      }
+      sources.innerHTML = items.map(source => {
+        const isSample = source.access_mode === 'sample';
+        const description = isSample
+          ? 'SQLite · 官方示例 · 可删除后重新下载'
+          : `${source.kind} · 手动导入 · ${source.metadata?.file_count || 0} 个文件`;
+        return `
+          <article class="card">
+            <div class="card-top">
+              <h3>${escapeHtml(source.name)}</h3>
+              <span class="pill ready">${escapeHtml(source.status)}</span>
+            </div>
+            <p>${escapeHtml(description)}</p>
+            <div class="card-actions">
+              <button class="button" type="button" data-schema="${escapeHtml(source.id)}">查看 Schema</button>
+              <button class="button" type="button" data-query="${escapeHtml(source.id)}">进入查询</button>
+              <button class="button danger" type="button" data-delete="${escapeHtml(source.id)}" data-name="${escapeHtml(source.name)}" data-sample="${isSample}">永久删除数据库</button>
+            </div>
+            <pre id="schema-${escapeHtml(source.id)}" hidden></pre>
+          </article>`;
+      }).join('');
+
+      sources.querySelectorAll('[data-schema]').forEach(button => button.addEventListener('click', async () => {
+        const target = document.querySelector(`#schema-${CSS.escape(button.dataset.schema)}`);
+        if (!target.hidden) { target.hidden = true; return; }
+        button.disabled = true;
+        try {
+          const body = await jsonRequest(`/api/data-sources/${encodeURIComponent(button.dataset.schema)}/schema`);
+          target.textContent = JSON.stringify(body.schema || body, null, 2);
+          target.hidden = false;
+        } catch (error) { showNotice(sourceNotice, error.message, true); }
+        finally { button.disabled = false; }
+      }));
+      sources.querySelectorAll('[data-query]').forEach(button => button.addEventListener('click', () => {
+        location.href = `/chat/?data_source_id=${encodeURIComponent(button.dataset.query)}`;
+      }));
+      sources.querySelectorAll('[data-delete]').forEach(button => button.addEventListener('click', async () => {
+        const targetDescription = button.dataset.sample === 'true'
+          ? 'Chinook SQLite 文件和所有对话绑定'
+          : 'DuckDB、原始上传文件和所有对话绑定';
+        if (!confirm(`确定永久删除数据库“${button.dataset.name}”吗？\n将物理删除${targetDescription}，此操作不可恢复。`)) return;
+        button.disabled = true;
+        try {
+          const body = await jsonRequest(`/api/data-sources/${encodeURIComponent(button.dataset.delete)}`, {method: 'DELETE'});
+          if (!body.physical_deleted) throw new Error('服务端未能确认数据库文件已物理删除。');
+          const fallback = body.conversation_fallback?.name;
+          showNotice(sourceNotice, `数据库“${body.source.name}”已从磁盘永久删除${fallback ? `；对话将回退到“${fallback}”` : '；当前已无可用数据源'}。`);
+          await Promise.all([loadSources(), loadReadiness()]);
+        } catch (error) {
+          button.disabled = false;
+          showNotice(sourceNotice, error.message, true);
+        }
+      }));
+      return items;
+    }
+
+    document.querySelector('#key-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const apiKeyInput = document.querySelector('#api-key');
+      const submit = document.querySelector('#save-key');
+      submit.disabled = true;
+      showNotice(llmNotice, '正在调用 DeepSeek 验证 Key，通过后才会保存…');
+      try {
+        const status = await jsonRequest('/api/settings/llm', {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({api_key: apiKeyInput.value})
+        });
+        form.reset();
+        showNotice(llmNotice, status.source === 'personal' ? '验证成功，个人 Key 已加密保存并生效。' : '验证成功。');
+        await Promise.all([loadLlm(), loadReadiness()]);
+      } catch (error) { showNotice(llmNotice, error.message, true); }
+      finally { submit.disabled = false; }
+    });
+
+    deleteKeyButton.addEventListener('click', async () => {
+      if (!confirm('确定删除当前用户保存的个人 DeepSeek API Key 吗？')) return;
+      deleteKeyButton.disabled = true;
+      try {
+        const body = await jsonRequest('/api/settings/llm', {method: 'DELETE'});
+        const message = body.llm.configured
+          ? '个人 Key 已删除，已回退到服务器环境变量中的 Key。'
+          : '个人 Key 已删除；当前没有可用模型凭据。';
+        showNotice(llmNotice, message);
+        await Promise.all([loadLlm(), loadReadiness()]);
+      } catch (error) { showNotice(llmNotice, error.message, true); }
+      finally { deleteKeyButton.disabled = false; }
+    });
+
+    installButton.addEventListener('click', async () => {
+      installButton.disabled = true;
+      installButton.textContent = '正在下载并校验…';
+      showNotice(sourceNotice, '正在从 Vanna 官网下载 Chinook，请稍候…');
+      try {
+        const body = await jsonRequest('/api/sample-data/chinook', {method: 'POST'});
+        showNotice(sourceNotice, `示例已就绪：${body.source.name}。`);
+        await Promise.all([loadSources(), loadReadiness()]);
+      } catch (error) {
+        installButton.disabled = false;
+        installButton.textContent = '重试下载';
+        showNotice(sourceNotice, error.message, true);
+      }
+    });
+
+    document.querySelector('#upload-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const formElement = event.currentTarget;
+      const submit = formElement.querySelector('button[type="submit"]');
+      submit.disabled = true;
+      showNotice(sourceNotice, '正在导入、推断 Schema 并生成只读 DuckDB…');
+      try {
+        const body = await jsonRequest('/api/data-sources/import', {
+          method: 'POST', body: new FormData(formElement)
+        });
+        showNotice(sourceNotice, `导入成功：${body.name}，共 ${body.metadata?.tables?.length || 0} 张表。`);
+        formElement.reset();
+        await Promise.all([loadSources(), loadReadiness()]);
+      } catch (error) { showNotice(sourceNotice, error.message, true); }
+      finally { submit.disabled = false; }
+    });
+
+    document.querySelectorAll('[data-unfinished]').forEach(button => button.addEventListener('click', () => {
+      showNotice(sourceNotice, '该功能尚未完成，当前只展示后续接入入口。');
+    }));
+
+    Promise.all([loadLlm(), loadSources(), loadReadiness()]).catch(error => {
+      showNotice(sourceNotice, `设置页初始化失败：${error.message}`, true);
+    });
+  </script>
+</body>
+</html>
